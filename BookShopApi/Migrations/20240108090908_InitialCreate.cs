@@ -17,7 +17,7 @@ namespace BookShopApi.Migrations
                 {
                     id_author = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,7 +44,7 @@ namespace BookShopApi.Migrations
                 {
                     id_genre = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,9 +70,10 @@ namespace BookShopApi.Migrations
                 {
                     id_user = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    surname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    id_city = table.Column<int>(type: "int", nullable: false),
                     CityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -94,6 +95,8 @@ namespace BookShopApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    id_author = table.Column<int>(type: "int", nullable: false),
+                    id_genre = table.Column<int>(type: "int", nullable: false),
                     AuthorId = table.Column<int>(type: "int", nullable: false),
                     GenreId = table.Column<int>(type: "int", nullable: false),
                     amount = table.Column<int>(type: "int", nullable: false),
@@ -123,14 +126,14 @@ namespace BookShopApi.Migrations
                     id_order = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    id_user = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_order", x => x.id_order);
                     table.ForeignKey(
-                        name: "FK_order_user_UserId",
-                        column: x => x.UserId,
+                        name: "FK_order_user_id_user",
+                        column: x => x.id_user,
                         principalTable: "user",
                         principalColumn: "id_user",
                         onDelete: ReferentialAction.Cascade);
@@ -140,22 +143,25 @@ namespace BookShopApi.Migrations
                 name: "book_order",
                 columns: table => new
                 {
-                    id_book = table.Column<int>(type: "int", nullable: false),
-                    id_order = table.Column<int>(type: "int", nullable: false),
                     id_book_order = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id_book = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    id_order = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_book_order", x => new { x.id_book, x.id_order });
+                    table.PrimaryKey("PK_book_order", x => x.id_book_order);
                     table.ForeignKey(
-                        name: "FK_book_order_book_id_book",
-                        column: x => x.id_book,
+                        name: "FK_book_order_book_BookId",
+                        column: x => x.BookId,
                         principalTable: "book",
                         principalColumn: "id_book",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_book_order_order_id_order",
-                        column: x => x.id_order,
+                        name: "FK_book_order_order_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "order",
                         principalColumn: "id_order",
                         onDelete: ReferentialAction.Cascade);
@@ -165,31 +171,33 @@ namespace BookShopApi.Migrations
                 name: "order_stage",
                 columns: table => new
                 {
+                    id_order_stage = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     id_order = table.Column<int>(type: "int", nullable: false),
                     id_stage = table.Column<int>(type: "int", nullable: false),
-                    id_order_stage = table.Column<int>(type: "int", nullable: false),
-                    DateStepBeg = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateStepEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    OrderStageIdOrder = table.Column<int>(type: "int", nullable: true),
-                    OrderStageIdStage = table.Column<int>(type: "int", nullable: true)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    StageId = table.Column<int>(type: "int", nullable: false),
+                    date_step_beg = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    date_step_end = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderStageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_order_stage", x => new { x.id_order, x.id_stage });
+                    table.PrimaryKey("PK_order_stage", x => x.id_order_stage);
                     table.ForeignKey(
-                        name: "FK_order_stage_order_id_order",
-                        column: x => x.id_order,
+                        name: "FK_order_stage_order_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "order",
                         principalColumn: "id_order",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_order_stage_order_stage_OrderStageIdOrder_OrderStageIdStage",
-                        columns: x => new { x.OrderStageIdOrder, x.OrderStageIdStage },
+                        name: "FK_order_stage_order_stage_OrderStageId",
+                        column: x => x.OrderStageId,
                         principalTable: "order_stage",
-                        principalColumns: new[] { "id_order", "id_stage" });
+                        principalColumn: "id_order_stage");
                     table.ForeignKey(
-                        name: "FK_order_stage_stage_id_stage",
-                        column: x => x.id_stage,
+                        name: "FK_order_stage_stage_StageId",
+                        column: x => x.StageId,
                         principalTable: "stage",
                         principalColumn: "id_stage",
                         onDelete: ReferentialAction.Cascade);
@@ -206,24 +214,34 @@ namespace BookShopApi.Migrations
                 column: "GenreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_book_order_id_order",
+                name: "IX_book_order_BookId",
                 table: "book_order",
-                column: "id_order");
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_UserId",
+                name: "IX_book_order_OrderId",
+                table: "book_order",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_order_id_user",
                 table: "order",
-                column: "UserId");
+                column: "id_user");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_stage_id_stage",
+                name: "IX_order_stage_OrderId",
                 table: "order_stage",
-                column: "id_stage");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_stage_OrderStageIdOrder_OrderStageIdStage",
+                name: "IX_order_stage_OrderStageId",
                 table: "order_stage",
-                columns: new[] { "OrderStageIdOrder", "OrderStageIdStage" });
+                column: "OrderStageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_order_stage_StageId",
+                table: "order_stage",
+                column: "StageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_CityId",

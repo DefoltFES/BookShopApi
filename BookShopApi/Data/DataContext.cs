@@ -23,21 +23,7 @@ namespace BookShopApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<BookOrder>().HasKey(bo => new {bo.IdBook,bo.IdOrder});
-            modelBuilder.Entity<BookOrder>().HasOne(b=> b.Book)
-                .WithMany(bo=>bo.BookOrders)
-                .HasForeignKey(b=>b.IdBook);
-            modelBuilder.Entity<BookOrder>().HasOne(b => b.Order)
-                .WithMany(bo => bo.BookOrders)
-                .HasForeignKey(b => b.IdOrder);
 
-            modelBuilder.Entity<OrderStage>().HasKey(bo => new { bo.IdOrder, bo.IdStage });
-            modelBuilder.Entity<OrderStage>().HasOne(o => o.Order)
-                .WithMany(os => os.OrderStages)
-                .HasForeignKey(b => b.IdOrder);
-            modelBuilder.Entity<OrderStage>().HasOne(s => s.Stage)
-                .WithMany(os => os.OrderStages)
-                .HasForeignKey(b => b.IdStage);
 
         }
     }

@@ -11,6 +11,9 @@ namespace BookShopApi.Models
         [Column("description")]
         public string Description { get; set; }
 
+        [Column("id_user")]
+        [ForeignKey(nameof(Models.User))]
+        public int UserId { get; set; }
         public User User { get; set; }
 
         public ICollection<BookOrder> BookOrders { get; set; }

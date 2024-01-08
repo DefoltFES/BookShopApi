@@ -13,5 +13,7 @@ namespace BookShopApi.Models
 
         [Column("day_delivery")]
         public string DayDelivery { get; set; }
+
+        public ICollection<User> Users { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookShopApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240107160344_InitialCreate")]
+    [Migration("20240108090908_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,7 +36,8 @@ namespace BookShopApi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)")
                         .HasColumnName("name");
 
                     b.HasKey("Id");
@@ -63,6 +64,14 @@ namespace BookShopApi.Migrations
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdAuthor")
+                        .HasColumnType("int")
+                        .HasColumnName("id_author");
+
+                    b.Property<int>("IdGenre")
+                        .HasColumnType("int")
+                        .HasColumnName("id_genre");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -88,6 +97,16 @@ namespace BookShopApi.Migrations
 
             modelBuilder.Entity("BookShopApi.Models.BookOrder", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_book_order");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdBook")
                         .HasColumnType("int")
                         .HasColumnName("id_book");
@@ -96,13 +115,14 @@ namespace BookShopApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id_order");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasColumnName("id_book_order");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
 
-                    b.HasKey("IdBook", "IdOrder");
+                    b.HasKey("Id");
 
-                    b.HasIndex("IdOrder");
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("book_order");
                 });
@@ -142,7 +162,8 @@ namespace BookShopApi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)")
                         .HasColumnName("name");
 
                     b.HasKey("Id");
@@ -165,7 +186,8 @@ namespace BookShopApi.Migrations
                         .HasColumnName("description");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id_user");
 
                     b.HasKey("Id");
 
@@ -176,6 +198,21 @@ namespace BookShopApi.Migrations
 
             modelBuilder.Entity("BookShopApi.Models.OrderStage", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_order_stage");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateStepBeg")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_step_beg");
+
+                    b.Property<DateTime>("DateStepEnd")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_step_end");
+
                     b.Property<int>("IdOrder")
                         .HasColumnType("int")
                         .HasColumnName("id_order");
@@ -184,27 +221,22 @@ namespace BookShopApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id_stage");
 
-                    b.Property<DateTime>("DateStepBeg")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateStepEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasColumnName("id_order_stage");
-
-                    b.Property<int?>("OrderStageIdOrder")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderStageIdStage")
+                    b.Property<int?>("OrderStageId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdOrder", "IdStage");
+                    b.Property<int>("StageId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("IdStage");
+                    b.HasKey("Id");
 
-                    b.HasIndex("OrderStageIdOrder", "OrderStageIdStage");
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("OrderStageId");
+
+                    b.HasIndex("StageId");
 
                     b.ToTable("order_stage");
                 });
@@ -242,17 +274,24 @@ namespace BookShopApi.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("email");
+
+                    b.Property<int>("IdCity")
+                        .HasColumnType("int")
+                        .HasColumnName("id_city");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("name");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("surname");
 
                     b.HasKey("Id");
@@ -265,13 +304,13 @@ namespace BookShopApi.Migrations
             modelBuilder.Entity("BookShopApi.Models.Book", b =>
                 {
                     b.HasOne("BookShopApi.Models.Author", "Author")
-                        .WithMany()
+                        .WithMany("Books")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookShopApi.Models.Genre", "Genre")
-                        .WithMany()
+                        .WithMany("Books")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -285,13 +324,13 @@ namespace BookShopApi.Migrations
                 {
                     b.HasOne("BookShopApi.Models.Book", "Book")
                         .WithMany("BookOrders")
-                        .HasForeignKey("IdBook")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookShopApi.Models.Order", "Order")
                         .WithMany("BookOrders")
-                        .HasForeignKey("IdOrder")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -315,19 +354,19 @@ namespace BookShopApi.Migrations
                 {
                     b.HasOne("BookShopApi.Models.Order", "Order")
                         .WithMany("OrderStages")
-                        .HasForeignKey("IdOrder")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BookShopApi.Models.Stage", "Stage")
-                        .WithMany("OrderStages")
-                        .HasForeignKey("IdStage")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookShopApi.Models.OrderStage", null)
                         .WithMany("OrderStages")
-                        .HasForeignKey("OrderStageIdOrder", "OrderStageIdStage");
+                        .HasForeignKey("OrderStageId");
+
+                    b.HasOne("BookShopApi.Models.Stage", "Stage")
+                        .WithMany("OrderStages")
+                        .HasForeignKey("StageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Order");
 
@@ -337,7 +376,7 @@ namespace BookShopApi.Migrations
             modelBuilder.Entity("BookShopApi.Models.User", b =>
                 {
                     b.HasOne("BookShopApi.Models.City", "City")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -345,9 +384,24 @@ namespace BookShopApi.Migrations
                     b.Navigation("City");
                 });
 
+            modelBuilder.Entity("BookShopApi.Models.Author", b =>
+                {
+                    b.Navigation("Books");
+                });
+
             modelBuilder.Entity("BookShopApi.Models.Book", b =>
                 {
                     b.Navigation("BookOrders");
+                });
+
+            modelBuilder.Entity("BookShopApi.Models.City", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("BookShopApi.Models.Genre", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BookShopApi.Models.Order", b =>

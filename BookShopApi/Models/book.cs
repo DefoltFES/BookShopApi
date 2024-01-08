@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookShopApi.Models
 {
@@ -12,12 +13,22 @@ namespace BookShopApi.Models
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("id_author")]
+        [ForeignKey(nameof(Models.Author))]
+        public int IdAuthor { get; set; }
+
+        [Column("id_genre")]
+        [ForeignKey(nameof(Models.Genre))]
+        public int IdGenre { get; set; }
+
         public Author Author { get; set; }
+     
         public Genre Genre { get; set; }
 
         [Column("amount")]
         public int Amount { get; set; }
         [Column("price")]
+        [Precision(18, 2)]
         public decimal Price { get; set; }
 
         public ICollection<BookOrder> BookOrders { get; set; }
